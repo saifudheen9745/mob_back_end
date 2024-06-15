@@ -24,12 +24,27 @@ public class JwtService {
     Key hmacKey = new SecretKeySpec(Base64.getDecoder().decode(secret), 
                             SignatureAlgorithm.HS256.getJcaName());
 
-    public String createJwtToken (String name, String email) {
+    public String createJwtAccessToken (String name, String email) {
+        String jwtToken = Jwts.builder()
+        .claim("email", email)
+        .claim("name", name)
+        .setIssuedAt(Date.from(Instant.now()))
+        .setExpiration(Date.from(Instant.now().plus(10l, ChronoUnit.SECONDS)))
+        .signWith(hmacKey)
+        .compact();
+
+        Jws<Claims> data = this.decodeJwtToken(jwtToken);
+        System.out.println(data);
+
+        return jwtToken;
+    }
+
+    public String createJwtRefreshToken (String name, String email) {
         String jwtToken = Jwts.builder()
         .claim("name", name)
         .claim("email", email)
         .setIssuedAt(Date.from(Instant.now()))
-        .setExpiration(Date.from(Instant.now().plus(10l, ChronoUnit.SECONDS)))
+        .setExpiration(Date.from(Instant.now().plus(2l, ChronoUnit.DAYS)))
         .signWith(hmacKey)
         .compact();
         return jwtToken;
