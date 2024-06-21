@@ -38,7 +38,6 @@ public class AdminAuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody Admin adminDetails) {
         try {
-            
             boolean hasRegitered = this.adminAuthService.doRgister(adminDetails);
             if(hasRegitered){
                 return new ResponseEntity<>(new AuthResponse("Registration Successful", true), HttpStatus.OK);
