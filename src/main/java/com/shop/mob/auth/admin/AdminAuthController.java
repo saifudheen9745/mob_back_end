@@ -23,7 +23,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 
 @RestController
-@RequestMapping(path="api/v1/admin", produces=MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path="api/v1/admin/auth", produces=MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin(origins="*")
 public class AdminAuthController {
     

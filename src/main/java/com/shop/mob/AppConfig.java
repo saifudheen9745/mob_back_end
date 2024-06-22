@@ -13,6 +13,6 @@ public class AppConfig implements  WebMvcConfigurer{
 
     @Override
     public void addInterceptors (InterceptorRegistry registry){
-        registry.addInterceptor(apiInterceptor).addPathPatterns("/api/v1/product");
+        registry.addInterceptor(apiInterceptor).addPathPatterns("/api/v1/admin/category");
     }
 }

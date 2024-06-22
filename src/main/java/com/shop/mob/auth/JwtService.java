@@ -29,13 +29,11 @@ public class JwtService {
         .claim("email", email)
         .claim("name", name)
         .setIssuedAt(Date.from(Instant.now()))
-        .setExpiration(Date.from(Instant.now().plus(10l, ChronoUnit.SECONDS)))
+        .setExpiration(Date.from(Instant.now().plus(20l, ChronoUnit.MINUTES)))
         .signWith(hmacKey)
         .compact();
 
         Jws<Claims> data = this.decodeJwtToken(jwtToken);
-        System.out.println(data);
-
         return jwtToken;
     }
 
