@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
 
 
@@ -42,9 +43,9 @@ public class AdminCategoryController {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @PostMapping()
-    public ResponseEntity<AdminCategoryResponse> createNewCategory(@RequestBody Category categoryDetails) {
+    public ResponseEntity<AdminCategoryResponse> createNewCategory(@RequestBody MultipartFile image, String name) {
         try {
-            Category category = this.adminCategoryService.createNewCategory(categoryDetails);
+            Category category = this.adminCategoryService.createNewCategory(image, name);
             if(category != null){
                 return new ResponseEntity<>(new AdminCategoryResponse(Arrays.asList(category), "Category created successfully", true),HttpStatus.CREATED);
             }else{
@@ -71,10 +72,10 @@ public class AdminCategoryController {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    @PutMapping()
-    public ResponseEntity<AdminCategoryResponse> updateCategory(@RequestBody Category categoryDetails) {
+    @PutMapping(consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<AdminCategoryResponse> updateCategory(@RequestBody MultipartFile image, Long id, String name) {
         try {
-            Category category = this.adminCategoryService.createNewCategory(categoryDetails);
+            Category category = this.adminCategoryService.updateCategory(image, id, name);
             if(category != null){
                 return new ResponseEntity<>(new AdminCategoryResponse(Arrays.asList(category), "Category updated successfully", true),HttpStatus.CREATED);
             }else{
@@ -84,6 +85,11 @@ public class AdminCategoryController {
             return new ResponseEntity<>(new AdminCategoryResponse(Arrays.asList(), e.getMessage(), false),HttpStatus.EXPECTATION_FAILED);
         }
     }
+
+    // @PostMapping("/test")
+    // public String test(@RequestBody MultipartFile image, String name) {
+    //     return adminCategoryService.uploadFile(image, "Mob", name);
+    // }
     
     
 }

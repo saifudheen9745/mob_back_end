@@ -29,7 +29,7 @@ public class JwtService {
         .claim("email", email)
         .claim("name", name)
         .setIssuedAt(Date.from(Instant.now()))
-        .setExpiration(Date.from(Instant.now().plus(30l, ChronoUnit.SECONDS)))
+        .setExpiration(Date.from(Instant.now().plus(2l, ChronoUnit.HOURS)))
         .signWith(hmacKey)
         .compact();
 

@@ -1,17 +1,28 @@
 package com.shop.mob.categories.admin;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.cloudinary.Cloudinary;
+
+import io.jsonwebtoken.io.IOException;
+import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 
 @Service
 public class AdminCategoryService {
 
     AdminCategoryRepository adminCategoryRepository;
+    
+    @Resource
+    private Cloudinary cloudinary;
 
     public AdminCategoryService(AdminCategoryRepository adminCategoryRepository) {
         this.adminCategoryRepository = adminCategoryRepository;
@@ -25,16 +36,27 @@ public class AdminCategoryService {
         return adminCategoryRepository.findAll();
     }
 
-    public Category createNewCategory(Category categoryDetails) {
-        if (isBlank(categoryDetails.getName()) || isBlank(categoryDetails.getImage())) {
+    public Category createNewCategory(MultipartFile image, String name) {
+        if (isBlank(name) || image.isEmpty() ) {
             throw new IllegalStateException("All fields (name and image) are required");
         }
 
-        Optional<Category> cat = adminCategoryRepository.findCategoryByName(categoryDetails.getName());
+        Optional<Category> cat = adminCategoryRepository.findCategoryByName(name);
         if(cat.isPresent()){
-            throw new IllegalStateException("Category with name "+categoryDetails.getName()+" already exists");
+            throw new IllegalStateException("Category with name "+name+" already exists");
         }
-        return adminCategoryRepository.save(categoryDetails);
+
+        String imageUrl = this.uploadFile(image, name);
+
+        Category newCategory = new Category();
+        newCategory.setName(name);
+        if(!isBlank(imageUrl)){
+            newCategory.setImage(imageUrl);
+        }else{
+            newCategory.setImage("");
+        }
+        
+        return adminCategoryRepository.save(newCategory);
     }
 
     public boolean deleteCategory(String categoryId) {
@@ -55,19 +77,39 @@ public class AdminCategoryService {
     }
 
     @Transactional
-    public Category updateCategory(Category categoryDetails){
-        if(isBlank(categoryDetails.getId().toString())){
+    public Category updateCategory(@RequestBody MultipartFile image, Long id, String name){
+        System.out.println("inside");
+        if(isBlank(id.toString())){
             throw new IllegalStateException("Category ID is required");
         }
-        Category category = adminCategoryRepository.findById(categoryDetails.getId()).orElseThrow(() -> new IllegalStateException("No category found with the id " + categoryDetails.getId()));
-        if(!isBlank(categoryDetails.getName()) && !Objects.equals(category.getName(), categoryDetails.getName())){
-            Optional<Category> nameExist = adminCategoryRepository.findCategoryByName(categoryDetails.getName());
-            if(nameExist.isPresent()){
+        Category category = adminCategoryRepository.findById(id).orElseThrow(() -> new IllegalStateException("No category found with the id " + id));
+        if(!isBlank(name) && !Objects.equals(category.getName(), name) ){
+            Optional<Category> nameExist = adminCategoryRepository.findCategoryByName(name);
+            if(nameExist.isPresent() && !Objects.equals(nameExist.get().getId(), id)){
                 throw new IllegalStateException("Category with same name already exists");
             }
-            category.setName(categoryDetails.getName());
+            category.setName(name);
+        }
+        if(image != null && !image.isEmpty()){
+            String imageUrl = this.uploadFile(image, name);
+            category.setImage(imageUrl);
         }
         return category;
+    }
+
+    public String uploadFile(MultipartFile file, String imageName) {
+        try{
+            HashMap<Object, Object> options = new HashMap<>();
+            options.put("folder", "MOB");
+            options.put("public_id", imageName);
+            @SuppressWarnings("unchecked")
+            Map<String, String> uploadedFile = cloudinary.uploader().upload(file.getBytes(), options);
+            String publicId = (String) uploadedFile.get("public_id");
+            return cloudinary.url().secure(true).generate(publicId);
+
+        }catch (IOException | java.io.IOException e){
+            return null;
+        }
     }
     
 }
