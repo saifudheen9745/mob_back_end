@@ -33,27 +33,15 @@ public class AdminProductService {
 
     public Product createNewProduct (HashMap<String, Object> formData, MultipartFile image){
 
+        validateRequiredFields(formData);
+
         Product newProduct = new Product();
-        try {
-            newProduct.setName((String) formData.get("name"));
-            newProduct.setDescription((String) formData.get("description"));
-            newProduct.setPrice(Float.valueOf((String) formData.get("price")));
-            newProduct.setQuantity(Long.valueOf((String) formData.get("quantity")));
-            newProduct.setCategory((String) formData.get("category"));
-
-            // Checking if the disable contains any value
-            Optional<Boolean> isDisabledOptional = Optional.ofNullable(formData.get("disabled"))
-            .map(value -> Boolean.valueOf(value.toString()));
-            if (isDisabledOptional.isPresent()) {
-                boolean isDisabled = isDisabledOptional.get();
-                newProduct.setDisabled(isDisabled);
-            } else {
-                throw new IllegalArgumentException("The 'disabled' field is not provided.");
-            }
-
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Something went wrong, Please make sure if all the fields are provided");
-        }
+       
+        newProduct.setName((String) formData.get("name"));
+        newProduct.setDescription((String) formData.get("description"));
+        newProduct.setPrice(Float.valueOf((String) formData.get("price")));
+        newProduct.setQuantity(Long.valueOf((String) formData.get("quantity")));
+        newProduct.setCategory((String) formData.get("category"));
 
         if (isBlank(newProduct.getName()) || isBlank(newProduct.getPrice()) ||
         isBlank(newProduct.getDescription()) || isBlank(newProduct.getQuantity())) {
@@ -74,28 +62,17 @@ public class AdminProductService {
     @SuppressWarnings("unlikely-arg-type")
     @Transactional
     public Product updateProduct(HashMap<String, Object> formData,@RequestBody MultipartFile image){
+
+        validateRequiredFields(formData);
+
         Product newProduct = new Product();
-        try {
-            newProduct.setId(Long.valueOf(formData.get("id").toString()));
-            newProduct.setName((String) formData.get("name"));
-            newProduct.setDescription((String) formData.get("description"));
-            newProduct.setPrice(Float.valueOf((String) formData.get("price")));
-            newProduct.setQuantity(Long.valueOf((String) formData.get("quantity")));
-            newProduct.setCategory((String) formData.get("category"));
 
-            // Checking if the disable contains any value
-            Optional<Boolean> isDisabledOptional = Optional.ofNullable(formData.get("disabled"))
-            .map(value -> Boolean.valueOf(value.toString()));
-            if (isDisabledOptional.isPresent()) {
-                boolean isDisabled = isDisabledOptional.get();
-                newProduct.setDisabled(isDisabled);
-            } else {
-                throw new IllegalArgumentException("The 'disabled' field is not provided.");
-            }
-
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Something went wrong, Please make sure if all the fields are provided");
-        }
+        newProduct.setId(Long.valueOf(formData.get("id").toString()));
+        newProduct.setName((String) formData.get("name"));
+        newProduct.setDescription((String) formData.get("description"));
+        newProduct.setPrice(Float.valueOf((String) formData.get("price")));
+        newProduct.setQuantity(Long.valueOf((String) formData.get("quantity")));
+        newProduct.setCategory((String) formData.get("category"));
 
         if(isBlank(newProduct.getName())){
             throw new IllegalStateException("Product ID is required");
@@ -107,7 +84,7 @@ public class AdminProductService {
         if(!isBlank(formData.get("name").toString()) && !Objects.equals(product.getName(), formData.get("name")) ){
             Optional<Product> nameExist = adminProductRepository.findProductByName(formData.get("name").toString());
             if(nameExist.isPresent() && !Objects.equals(nameExist.get().getId(), newProduct.getName())){
-                throw new IllegalStateException("Category with same name already exists");
+                throw new IllegalStateException("Product with same name already exists");
             }
             product.setName(formData.get("name").toString());
         }
@@ -173,7 +150,7 @@ public class AdminProductService {
         try {
             HashMap<Object, Object> options = new HashMap<>();
             cloudinary.uploader().destroy("MOB/Products/"+name, options);
-        } catch (java.io.IOException ex) {
+        } catch (Exception ex) {
             
         }
     }
@@ -184,6 +161,23 @@ public class AdminProductService {
 
     public boolean isBlank(Number data){
         return data == null;
+    }
+
+    private void validateRequiredFields(HashMap<String, Object> formData) {
+        String[] requiredFields = {"name", "description", "price", "quantity", "disabled", "category"};
+        
+        for (String field : requiredFields) {
+            if (formData.get(field) == null || formData.get(field).toString().isEmpty()) {
+                throw new IllegalArgumentException("Missing form data for field: " + field);
+            }
+        }
+        
+        // Validate 'disabled' format (optional but recommended)
+        Optional<Boolean> isDisabledOptional = Optional.ofNullable(formData.get("disabled"))
+                .map(value -> Boolean.valueOf(value.toString()));
+        if (!isDisabledOptional.isPresent()) {
+            throw new IllegalArgumentException("Invalid format for 'disabled' field. Please provide true or false.");
+        }
     }
 
 }

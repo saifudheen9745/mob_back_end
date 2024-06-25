@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
@@ -117,7 +116,6 @@ public class AdminCategoryService {
             HashMap<Object, Object> options = new HashMap<>();
             cloudinary.uploader().destroy("MOB/Categories/"+name, options);
         } catch (java.io.IOException ex) {
-            
         }
     }
     
