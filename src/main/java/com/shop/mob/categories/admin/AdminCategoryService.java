@@ -70,6 +70,7 @@ public class AdminCategoryService {
                 throw new IllegalStateException("Category with ID " + categoryId + " not found");
             }
             adminCategoryRepository.deleteById(id);
+            this.deleteFile(category.get().getName());
             return true;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid Category ID format"); // More specific exception type
@@ -77,8 +78,7 @@ public class AdminCategoryService {
     }
 
     @Transactional
-    public Category updateCategory(@RequestBody MultipartFile image, Long id, String name){
-        System.out.println("inside");
+    public Category updateCategory(MultipartFile image, Long id, String name){
         if(isBlank(id.toString())){
             throw new IllegalStateException("Category ID is required");
         }
@@ -100,7 +100,7 @@ public class AdminCategoryService {
     public String uploadFile(MultipartFile file, String imageName) {
         try{
             HashMap<Object, Object> options = new HashMap<>();
-            options.put("folder", "MOB");
+            options.put("folder", "MOB/Categories");
             options.put("public_id", imageName);
             @SuppressWarnings("unchecked")
             Map<String, String> uploadedFile = cloudinary.uploader().upload(file.getBytes(), options);
@@ -109,6 +109,15 @@ public class AdminCategoryService {
 
         }catch (IOException | java.io.IOException e){
             return null;
+        }
+    }
+
+    public void deleteFile(String name){
+        try {
+            HashMap<Object, Object> options = new HashMap<>();
+            cloudinary.uploader().destroy("MOB/Categories/"+name, options);
+        } catch (java.io.IOException ex) {
+            
         }
     }
     
