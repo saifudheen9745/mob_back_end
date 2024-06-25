@@ -1,5 +1,6 @@
 package com.shop.mob.categories.admin;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,6 +24,7 @@ public class Category {
         generator="category_id_sequence"
     )
     private Long id;
+    @Column(unique=true)
     private String name;
     private String image;
 

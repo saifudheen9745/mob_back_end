@@ -1,14 +1,14 @@
-package com.shop.mob.categories.admin;
+package com.shop.mob;
 
 import java.util.List;
 
-public class AdminCategoryResponse<T> {
+public class HttpResponseModel<T> {
 
     private boolean success;
     private String message;
     private List<T> data;
 
-    public AdminCategoryResponse(List<T> data, String message, boolean success) {
+    public HttpResponseModel(List<T> data, String message, boolean success) {
         this.data = data;
         this.message = message;
         this.success = success;
