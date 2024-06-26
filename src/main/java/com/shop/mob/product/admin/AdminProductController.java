@@ -36,7 +36,7 @@ public class AdminProductController {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @GetMapping()
-    public ResponseEntity<HttpResponseModel> getAllCategories() {
+    public ResponseEntity<HttpResponseModel> getAllProudcts() {
         try {
             List<Product> products =  this.adminProductService.getAllProducts();
             return new ResponseEntity<>(new HttpResponseModel<>(products, "Product List", true),HttpStatus.OK);

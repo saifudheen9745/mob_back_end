@@ -42,6 +42,7 @@ public class AdminProductService {
         newProduct.setPrice(Float.valueOf((String) formData.get("price")));
         newProduct.setQuantity(Long.valueOf((String) formData.get("quantity")));
         newProduct.setCategory((String) formData.get("category"));
+        newProduct.setDisabled(Boolean.parseBoolean((String) formData.get("disabled")));
 
         if (isBlank(newProduct.getName()) || isBlank(newProduct.getPrice()) ||
         isBlank(newProduct.getDescription()) || isBlank(newProduct.getQuantity())) {
@@ -73,6 +74,7 @@ public class AdminProductService {
         newProduct.setPrice(Float.valueOf((String) formData.get("price")));
         newProduct.setQuantity(Long.valueOf((String) formData.get("quantity")));
         newProduct.setCategory((String) formData.get("category"));
+        newProduct.setDisabled(Boolean.parseBoolean((String) formData.get("disabled")));
 
         if(isBlank(newProduct.getName())){
             throw new IllegalStateException("Product ID is required");

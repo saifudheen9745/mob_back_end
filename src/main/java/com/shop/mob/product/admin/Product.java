@@ -29,7 +29,7 @@ public class Product {
     private Float price;
     private String image;
     private Long quantity;
-    private boolean disabled = false;
+    private boolean disabled;
     private String category;
 
     public Product(){}
